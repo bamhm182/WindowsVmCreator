@@ -77,3 +77,11 @@ It isn't taking up all of this space, so we can make that file smaller with the 
 ```
 qemu-img convert -O qcow2 ./windows.qcow2 ./windows.shrunk.qcow2
 ```
+
+It takes considerably longer, but you can squeeze a little more space out with `-c`:
+
+```
+qemu-img convert -c -O qcow2 ./windows.qcow2 ./windows.shrunk.qcow2
+```
+
+The base install was around `9.9GB` uncompressed, and `5.1GB` compressed.
