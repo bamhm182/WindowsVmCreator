@@ -10,11 +10,13 @@ I also wanted to be able to customize these images and create new images with as
 Binaries:
 - mkisofs
 - virt-viewer
+- qemu-img
 
 If you're using NixOS and already have libvirt set up, you should be able to get everything else needed with the following command:
 
 ```
-nix shell nixpkgs#crdkit nixpkgs#virt-viewer
+nix shell nixpkgs#cdrkit nixpkgs#virt-viewer nixpkgs#qemu
+```
 
 ## Download the Windows iso
 
@@ -65,4 +67,13 @@ At the end of the installation, you can run the following command to kill the Vi
 ```
 sudo virsh destroy windows
 sudo virsh undefine --nvram windows
+```
+
+## Shrink the qcow2
+
+At this point, you might notice that the qcow2 says it's 64GB.
+It isn't taking up all of this space, so we can make that file smaller with the following command:
+
+```
+qemu-img convert -O qcow2 ./windows.qcow2 ./windows.shrunk.qcow2
 ```
