@@ -108,6 +108,8 @@ I am using this image with Terraform, and IPv6 tends to get assigned before IPv4
 
 ```
 Get-NetAdapter | % {Disable-NetAdapterBinding -Name $_.Name -ComponentId ms_tcpip6}
+Add-WindowsCapability -Online -Name "OpenSSH.Server"
+Add-WindowsCapability -Online -Name "OpenSSH.Client"
 ```
 
 ## Shrink the qcow2
