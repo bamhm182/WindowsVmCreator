@@ -23,8 +23,9 @@ nix shell nixpkgs#cdrkit nixpkgs#virt-viewer nixpkgs#qemu
 You can download the official Windows ISO from the following website:
 
 - [Windows 11](https://www.microsoft.com/software-download/windows11)
+- [Stable virt-win ISO](https://github.com/virtio-win/virtio-win-pkg-scripts/tree/master)
 
-Copy it to this folder and name it `windows.iso`.
+Download these and places them in this folder named `windows.iso` and `virtio-win.iso` respectively.
 
 ## Generate the Answer File
 
@@ -56,6 +57,7 @@ sudo virt-install --name windows \
   --console pty,target_type=serial \
   --cdrom ./windows.iso \
   --disk path=./autounattend.iso,device=cdrom \
+  --disk path=./virtio-win.iso,device=cdrom \
   --disk path=./windows.qcow2,size=64,format=qcow2 \
   --os-variant win11 
 ```
@@ -64,9 +66,48 @@ Upon executing that command, virt-viewer should appear and (unfortunately) you w
 From there, however, you should just be able to walk off for about 30 minutes and come back to a Windows desktop.
 
 At the end of the installation, you can run the following command to kill the Virtual Machine while leaving the qcow2 intact:
+
 ```
 sudo virsh destroy windows
 sudo virsh undefine --nvram windows
+```
+
+## Post Installation
+
+I'm still trying to figure out a better way to do this, but I figured that in the meantime, I would take notes on how to do it manually.
+
+### VirtIO Drivers / QEMU Guest Agent
+
+I added instructions above for mounting this cdrom.
+If you already did that, skip to **continue here**.
+
+One of the biggest things I want to have working is the QEMU Guest Agent.
+First, download the [Stable virtio-win ISO](https://github.com/virtio-win/virtio-win-pkg-scripts/tree/master?search=1).
+Then execute the following commands:
+
+```
+$ sudo virsh domblklist windows
+ Target   Source
+-------------------------------------------------------------
+ sda      ./windows.iso
+ sdb      ./autounattend.iso
+ sdc      ./windows.qcow2
+
+$ sudo virsh attach-disk windows ./virtio.iso sdb --type cdrom
+```
+
+The ISOs will be swapped out.
+
+**continue here**
+
+Open the virtio-win disc and run through `virtio-win-guest-tools.exe` and `virtio-win-gw-x64.msi`.
+
+For some reason, the installation VM doesn't want to acknowledge that QEMU Guest Agent is working, but if you create a new VM based on this qcow2, it's fine.
+
+I am using this image with Terraform, and IPv6 tends to get assigned before IPv4, which causes issues because I need to wait for IPv4, so I'm disabling it with the following PowerShell command:
+
+```
+Get-NetAdapter | % {Disable-NetAdapterBinding -Name $_.Name -ComponentId ms_tcpip6}
 ```
 
 ## Shrink the qcow2
