@@ -58,7 +58,7 @@ sudo virt-install --name windows \
   --cdrom ./windows.iso \
   --disk path=./autounattend.iso,device=cdrom \
   --disk path=./virtio-win.iso,device=cdrom \
-  --disk path=./windows.qcow2,size=64,format=qcow2 \
+  --disk path=./windows.qcow2,size=128,format=qcow2 \
   --os-variant win11 
 ```
 
@@ -100,16 +100,23 @@ The ISOs will be swapped out.
 
 **continue here**
 
-Open the virtio-win disc and run through `virtio-win-guest-tools.exe` and `virtio-win-gw-x64.msi`.
+Open the virtio-win disc and run through `virtio-win-guest-tools.exe` and `virtio-win-gt-x64.msi`.
 
 For some reason, the installation VM doesn't want to acknowledge that QEMU Guest Agent is working, but if you create a new VM based on this qcow2, it's fine.
 
 I am using this image with Terraform, and IPv6 tends to get assigned before IPv4, which causes issues because I need to wait for IPv4, so I'm disabling it with the following PowerShell command:
 
 ```
-Get-NetAdapter | % {Disable-NetAdapterBinding -Name $_.Name -ComponentId ms_tcpip6}
-Add-WindowsCapability -Online -Name "OpenSSH.Server"
-Add-WindowsCapability -Online -Name "OpenSSH.Client"
+iex(iwr "https://raw.githubusercontent.com/bamhm182/WindowsVmCreator/wip-initial/configure.ps1")
+
+# Install programs with Ninite
+# Install Visual Studio Community 2022
+# Install System Updates
+# Unless I'm mistaken, I actually don't want this because it sets the box up as a new box and I just want something with known credentials that I can boot into immediately.
+# C:\Windows\System32\Sysprep\sysprep.exe
+#     OOBE
+#     Generalize: No
+#     Shutdown
 ```
 
 ## Shrink the qcow2
