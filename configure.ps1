@@ -1,5 +1,5 @@
 #Disable IPv6
-New-ItemProperty -Path "Registry::HKLM\System\CurrentControlSet\Service\Tcpip6\Parameters" -Name "DisabledComponents" -Value 255 -PropertyType DWord
+New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name "DisabledComponents" -Value 255 -PropertyType DWord
 
 # Configure WinRM
 Add-LocalGroupMember -Group 'Remote Management Users' -Member 'Admin'
