@@ -30,3 +30,4 @@ $envVariables = ${
     "CODER_AGENT_TOKEN_FILE" = "C:\Users\user\AppData\Coder\token"
     "CODER_AGENT_URL" = "https://coder.lab.bytepen.com"
 }
+Set-ScheduledTask -TaskName "CoderAgent" -TaskPath "\" -Principal $envVariables
