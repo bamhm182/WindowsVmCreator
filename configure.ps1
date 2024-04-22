@@ -23,7 +23,7 @@ New-Item -ItemType Directory -Path "C:\Users\user\AppData\Roaming\coder\"
 Invoke-WebRequest https://raw.githubusercontent.com/coder/coder/main/provisionersdk/scripts/bootstrap_windows.ps1 -OutFile C:\Users\user\AppData\Roaming\coder\coder.ps1
 $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Users\user\AppData\Roaming\coder\coder.ps1"
 $trigger = New-ScheduledTaskTrigger -AtStartup
-$principal = New-ScheduledTaskPrincipal -UserId "User" -LogonType S4U -RunLevel LeastPrivilege
+$principal = New-ScheduledTaskPrincipal -UserId "User" -LogonType S4U -RunLevel Limited
 Register-ScheduledTask -TaskName "CoderAgent" -Description "Start the Coder Agent" -Action $action -Trigger $trigger -Principal $principal
 $envVariables = ${
     "CODER_AGENT_AUTH" = "token"
