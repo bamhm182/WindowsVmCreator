@@ -121,7 +121,7 @@ iex(iwr "https://raw.githubusercontent.com/bamhm182/WindowsVmCreator/wip-initial
 
 ## Shrink the qcow2
 
-At this point, you might notice that the qcow2 says it's 64GB.
+At this point, you might notice that the qcow2 says it's 128GB.
 It isn't taking up all of this space, so we can make that file smaller with the following command:
 
 ```
