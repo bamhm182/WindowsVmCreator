@@ -31,3 +31,23 @@ $envVariables = ${
     "CODER_AGENT_URL" = "https://coder.lab.bytepen.com"
 }
 Set-ScheduledTask -TaskName "CoderAgent" -TaskPath "\" -Principal $envVariables
+
+# Configure Windows
+# Don't lock the screen when the screensaver appears
+Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name ScreenSaverIsSecure -Value 0
+# Dark Mode
+New-ItemProperty -Path "Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "AppsUseLightTheme" -Value 0 -PropertyType DWord
+New-ItemProperty -Path "Registry::HKEY_USERS\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "AppsUseLightTheme" -Value 0 -PropertyType DWord
+New-ItemProperty -Path "Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "SystemUsesLightTheme" -Value 0 -PropertyType DWord
+New-ItemProperty -Path "Registry::HKEY_USERS\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "SystemUsesLightTheme" -Value 0 -PropertyType DWord
+
+# Cleanup
+Get-WmiObject -Namespace "root\cimv2" -Class Win32_ShadowCopy | ForEach-Object { $_.Delete() }
+Remove-Item -Path "C:\Windows\SoftwareDistribution\Download\*" -Force -Recurse -ErrorAction SilentlyContinue
+Remove-Item -Path "$env:windir\$NT*" -Force -Recurse -ErrorAction SilentlyContinue -Attributes Hidden
+Remove-Item -Path "C:\Windows\Prefetch\*" -Force -Recurse -ErrorAction SilentlyContinue
+Start-Process -FilePath "C:\Windows\System32\cleanmgr.exe" -ArgumentList "/sagerun:1" -Wait
+Optimize-Volume -DriveLetter "C" -Defrag -Verbose
+Get-WinEvent -ListLog * | ForEach-Object { wevtutil cl $_.LogName }
+Clear-DnsClientCache
+Get-ChildItem -Path "$env:LOCALAPPDATA\Packages\Microsoft.MicrosoftEdge_*" -Recurse | Remove-Item -Force -Recurse
