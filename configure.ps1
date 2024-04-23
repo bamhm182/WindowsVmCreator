@@ -4,7 +4,9 @@ New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Se
 # Configure WinRM
 Add-LocalGroupMember -Group 'Remote Management Users' -Member 'Administrator' -ErrorAction SilentlyContinue
 Start-Service WinRM
-Set-Service -Name WinRM -StartupType 'Automatic'
+# Need to use sc, or it goes to Automatic (Delayed Start) and Coder has issues
+#Set-Service -Name WinRM -StartupType 'Automatic'
+sc.exe config WinRM start=auto
 Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*' -Force
 Restart-Service WinRM
 
@@ -19,18 +21,19 @@ Set-Service -Name sshd -StartupType 'Automatic'
 New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -Force -ErrorAction SilentlyContinue
 
 # Configure Coder
-#New-Item -ItemType Directory -Path "C:\Users\user\AppData\Roaming\coder\"
-#Invoke-WebRequest https://raw.githubusercontent.com/coder/coder/main/provisionersdk/scripts/bootstrap_windows.ps1 -OutFile C:\Users\user\AppData\Roaming\coder\coder.ps1
-#$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Users\user\AppData\Roaming\coder\coder.ps1"
-#$trigger = New-ScheduledTaskTrigger -AtStartup
-#$principal = New-ScheduledTaskPrincipal -UserId "User" -LogonType S4U -RunLevel Limited
-#Register-ScheduledTask -TaskName "CoderAgent" -Description "Start the Coder Agent" -Action $action -Trigger $trigger -Principal $principal
-#$envVariables = ${
-#    "CODER_AGENT_AUTH" = "token"
-#    "CODER_AGENT_TOKEN_FILE" = "C:\Users\user\AppData\Coder\token"
-#    "CODER_AGENT_URL" = "https://coder.lab.bytepen.com"
-#}
-#Set-ScheduledTask -TaskName "CoderAgent" -TaskPath "\" -Principal $envVariables
+New-Item -ItemType Directory -Path "$env:APPDATA\coder\"
+Invoke-WebRequest "https://raw.githubusercontent.com/coder/coder/main/provisionersdk/scripts/bootstrap_windows.ps1" -OutFile "$env:APPDATA\coder\coder.ps1"
+$action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-ExecutionPolicy Bypass -File $env:APPDATA\coder\coder.ps1"
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$principal = New-ScheduledTaskPrincipal -UserId "Administrator" -RunLevel Limited
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -RestartCount 999 -RestartInterval (New-Timespan -Minuates 1)
+Register-ScheduledTask -TaskName "CoderAgent" -Description "Start the Coder Agent" -Action $action -Trigger $trigger -Principal $principal -Settings $settings
+[System.Environment]::SetEnvironmentVariable("CODER_AGENT_AUTH", "token", "Machine")
+[System.Environment]::SetEnvironmentVariable("CODER_AGENT_AUTH", "token", "User")
+[System.Environment]::SetEnvironmentVariable("CODER_AGENT_TOKEN_FILE", "$env:APPDATA\coder\token", "Machine")
+[System.Environment]::SetEnvironmentVariable("CODER_AGENT_TOKEN_FILE", "$env:APPDATA\coder\token", "User")
+[System.Environment]::SetEnvironmentVariable("CODER_AGENT_URL", "https://coder.lab.bytepen.com", "Machine")
+[System.Environment]::SetEnvironmentVariable("CODER_AGENT_URL", "https://coder.lab.bytepen.com", "User")
 
 # Configure Windows
 # Don't lock the screen when the screensaver appears
@@ -54,3 +57,5 @@ Get-ChildItem -Path "$env:LOCALAPPDATA\Packages\Microsoft.MicrosoftEdge_*" -Recu
 Remove-Item -Path "$env:USERPROFILE\Downloads\*" -Force -Recurse
 Clear-History
 Remove-Item -Path "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\*" -Recurse
+Remove-Item -Path "C:\Users\Administrator\Desktop\*" -Force -Recurse -ErrorAction SilentlyContinue
+Clear-RecycleBin -Force
