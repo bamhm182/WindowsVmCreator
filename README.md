@@ -107,7 +107,7 @@ For some reason, the installation VM doesn't want to acknowledge that QEMU Guest
 I am using this image with Terraform, and IPv6 tends to get assigned before IPv4, which causes issues because I need to wait for IPv4, so I'm disabling it with the following PowerShell command:
 
 ```
-iex(iwr "https://raw.githubusercontent.com/bamhm182/WindowsVmCreator/wip-initial/configure.ps1")
+iex(iwr "https://raw.githubusercontent.com/bamhm182/WindowsVmCreator/wip-initial/configure.ps1" -UseBasicParsing)
 
 # Install programs with Ninite
 # Install Visual Studio Community 2022
