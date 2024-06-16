@@ -27,6 +27,14 @@ You can download the official Windows ISO from the following website:
 
 Download these and places them in this folder named `windows.iso` and `virtio-win.iso` respectively.
 
+### Virtio Versions
+
+VirtIO stopped supporting Windows 7 at [v0.1.173-4](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.173-4/), so if you're trying to use Windows 7, make sure to download v0.1.173-4.
+
+Windows 8+ appear to all be able to use the latest version.
+
+All versions can be found [here](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/).
+
 ## Generate the Answer File
 
 The key to an automated Windows installation lies in the `autounattend.xml` file.
