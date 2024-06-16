@@ -30,6 +30,7 @@ Download these and places them in this folder named `windows.iso` and `virtio-wi
 ### Virtio Versions
 
 VirtIO stopped supporting Windows 7 at [v0.1.173-4](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.173-4/), so if you're trying to use Windows 7, make sure to download v0.1.173-4.
+Unfortunately, you will likely recieve a message stating "VdService" failed to start. This is the Spice Agent service, and the only way I have found to get the install to complete is to disable Spice Agent when installing everything else.
 
 Windows 8+ appear to all be able to use the latest version.
 
