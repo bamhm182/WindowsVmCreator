@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
 
-for f in ./baselines/*.xml; do
-    mkisofs -o ${f%.xml}.iso -input-charset utf-8 -Jr ${f}
+for f in ./baselines/*; do
+    [[ -d "${f}" ]] && mkisofs -o ${f}.iso -input-charset utf-8 -Jr ${f}/autounattend.xml
 done
